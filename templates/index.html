@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTT Podium Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fef4f6; /* Soft K-ON Pink tone */
+            --cube-yellow: #ffb800;
+            --cube-orange: #ff6b00;
+            --cube-blue: #0070f3;
+            --htt-pink: #ff69b4;
+            --htt-dark: #2d2426;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--htt-dark);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        /* Rubik's Cube Layout Header Card */
+        .search-card {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(255, 105, 180, 0.15);
+            margin-bottom: 30px;
+            text-align: center;
+            border: 4px solid var(--htt-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cute decorative absolute border block paying homage to K-ON & Cubing styles */
+        .search-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 8px;
+            background: linear-gradient(90deg, #ff3b30, #ff9500, #ffcc00, #4cd964, #5ac8fa, #007aff);
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 36px;
+            color: var(--htt-dark);
+            margin: 0 0 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: #8a7a7d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            max-width: 550px;
+            margin: 0 auto;
+            gap: 12px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 20px;
+            border: 3px solid var(--htt-dark);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            box-shadow: 4px 4px 0px var(--htt-dark);
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--htt-dark);
+        }
+
+        button {
+            background: var(--htt-pink);
+            color: white;
+            border: 3px solid var(--htt-dark);
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--htt-dark);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--htt-dark);
+            background: #ff4da6;
+        }
+
+        .error {
+            background: #ffe4e6;
+            color: #b91c1c;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 3px solid #b91c1c;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Profile Header Wrapper */
+        .profile-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 30px;
+            border: 4px solid var(--htt-dark);
+            border-radius: 16px;
+            box-shadow: 6px 6px 0px var(--htt-dark);
+            margin-bottom: 35px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--htt-dark);
+        }
+
+        .profile-id {
+            font-size: 15px;
+            color: #7c6e71;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* OVERALL PODIUM SUMMARY SECTION */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 3px solid var(--htt-dark);
+            border-radius: 14px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 4px 4px 0px var(--htt-dark);
+        }
+
+        .stat-num {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b5c5e;
+        }
+
+        /* Table Dashboard Designs */
+        .table-wrapper {
+            background: white;
+            border: 4px solid var(--htt-dark);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 8px 8px 0px var(--htt-dark);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--htt-dark);
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 18px;
+            text-align: left;
+        }
+
+        td {
+            padding: 18px;
+            border-bottom: 3px solid #f1eeef;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border: none;
+        }
+
+        tr:nth-child(even) {
+            background: #fffcfd;
+        }
+
+        /* Medal Badges Layout styling */
+        .medal-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 16px;
+            border: 2px solid var(--htt-dark);
+        }
+
+        .gold { background-color: #ffd700; color: #665200; box-shadow: 2px 2px 0px var(--htt-dark); }
+        .silver { background-color: #e6e6e6; color: #4d4d4d; box-shadow: 2px 2px 0px var(--htt-dark); }
+        .bronze { background-color: #ffaa66; color: #804411; box-shadow: 2px 2px 0px var(--htt-dark); }
+
+        .total-pill {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 2px solid var(--htt-dark);
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-card">
+            <h1>🎸 Houkago Tea Time Podiums Finder 🧩</h1>
+            <div class="tagline">Cagayake! GIRLS Edition • Database Analytics Dashboard</div>
+            <form method="GET" action="/">
+                <div class="input-group">
+                    <input type="text" name="query" placeholder="Enter Competitor Name or WCA ID..." value="{{ request.args.get('query', '') }}" required autocomplete="off">
+                    <button type="submit">GO!</button>
+                </div>
+            </form>
+        </div>
+
+        {% if error %}
+            <div class="error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        {% if profile %}
+            <div class="profile-container">
+                <div>
+                    <div class="profile-name">✨ {{ profile.name }}</div>
+                    <div class="profile-id">WCA Member Reference ID: {{ profile.wca_id }}</div>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-card" style="background-color: #fffbeb;">
+                    <div class="stat-num" style="color: #b45309;">🥇 {{ totals.gold }}</div>
+                    <div class="stat-label">Total Gold</div>
+                </div>
+                <div class="stat-card" style="background-color: #f8fafc;">
+                    <div class="stat-num" style="color: #475569;">🥈 {{ totals.silver }}</div>
+                    <div class="stat-label">Total Silver</div>
+                </div>
+                <div class="stat-card" style="background-color: #fff7ed;">
+                    <div class="stat-num" style="color: #c2410c;">🥉 {{ totals.bronze }}</div>
+                    <div class="stat-label">Total Bronze</div>
+                </div>
+                <div class="stat-card" style="background-color: #fdf2f8; border-color: var(--htt-pink);">
+                    <div class="stat-num" style="color: var(--htt-pink);">🏆 {{ totals.overall }}</div>
+                    <div class="stat-label" style="color: var(--htt-pink);">Overall Podiums</div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Official WCA Event</th>
+                            <th style="width: 15%; text-align: center;">Gold</th>
+                            <th style="width: 15%; text-align: center;">Silver</th>
+                            <th style="width: 15%; text-align: center;">Bronze</th>
+                            <th style="width: 15%; text-align: center;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            <td><strong>{{ row.event_name }}</strong></td>
+                            <td style="text-align: center;"><span class="medal-badge gold">{{ row.gold }}</span></td>
+                            <td style="text-align: center;"><span class="medal-badge silver">{{ row.silver }}</span></td>
+                            <td style="text-align: center;"><span class="medal-badge bronze">{{ row.bronze }}</span></td>
+                            <td style="text-align: center;"><span class="total-pill">{{ row.total }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
