@@ -24,8 +24,8 @@ EVENT_NAMES = {
 def verify_and_compile_dataset():
     """
     Validates structural integrity of application assets. Evaluates binary Parquet availability.
-    Aggressively groups and sums records during compilation to smash file size to < 10MB,
-    strictly omitting DNF result markings.
+    Aggressively groups and sums records during compilation to smash file size to < 10MB.
+    Safely captures FMC podiums in single-round formats (round_type 'c') while avoiding duplication.
     """
     if os.path.exists(PARQUET_PATH):
         return True
@@ -41,13 +41,15 @@ def verify_and_compile_dataset():
         # 1. Scan raw data lazily
         lazy_tsv = pl.scan_csv(TSV_PATH, separator="\t", has_header=True, infer_schema_length=0)
         
-        # 2. Filter for podium positions, final rounds, AND explicitly exclude DNF values ("-1")
-        # In the WCA database schema, a single/average DNF status is represented as -1.
+        # 2. Extract valid podium placements
+        # - pos must be 1, 2, or 3
+        # - round_type_id must be "f" (Finals) OR "c" (Combined round, essential for FMC single-round podiums)
+        # - best must not be "-1" (DNF) or "-2" (DNS)
         filtered = lazy_tsv.filter(
             (pl.col("pos").is_in(["1", "2", "3"])) &
             (pl.col("round_type_id").is_in(["f", "c"])) &
-            (pl.col("best") != "-1") &       # Exclude best single DNF values
-            (pl.col("average") != "-1")      # Exclude average DNF values
+            (pl.col("best") != "-1") &                      
+            (pl.col("best") != "-2")                        
         )
         
         # 3. Collapse the entire dataset by grouping names/IDs and positions immediately
