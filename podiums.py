@@ -17,7 +17,7 @@ EVENT_NAMES = {
     "333oh": "3x3x3 One-Handed", "clock": "Clock", 
     "minx": "Megaminx", "pyram": "Pyraminx", "skewb": "Skewb", 
     "sq1": "Square-1", "444bf": "4x4x4 Blindfolded", 
-    "555bf": "5x5x5 Blindfolded", "333mbf": "3x3x3 Multi-Blind","333mbo": "3x3x3 Multi-Blind Oldstyle",
+    "555bf": "5x5x5 Blindfolded", "333mbf": "3x3x3 Multi-Blind", "333mbo": "3x3x3 Multi-Blind Oldstyle",
     "magic": "Magic", "mmagic": "Master Magic", "333ft": "3x3x3 With Feet"
 }
 
@@ -47,7 +47,6 @@ def verify_and_compile_dataset():
         )
         
         # 3. Collapse the entire dataset by grouping names/IDs and positions immediately
-        # This reduces 400,000+ individual rows to a small distinct count summary matrix!
         compact_df = (
             filtered.group_by(["person_id", "person_name", "event_id", "pos"])
             .agg(pl.len().alias("count"))
@@ -74,7 +73,7 @@ def verify_and_compile_dataset():
 
 def get_competitor_podiums(search_query: str):
     """
-    Queries data frames to aggregate medal allocations mapped to final and combined rounds.
+    Queries highly compressed pre-aggregated datasets instantly with safe string casting.
     """
     search_query = search_query.strip()
     if not search_query:
@@ -83,14 +82,10 @@ def get_competitor_podiums(search_query: str):
     # Load high-speed schema mapping
     lazy_df = pl.scan_parquet(PARQUET_PATH)
 
-    # REMOVED round_type_id filtering here because the Parquet file 
-    # is already pre-filtered for finals and combined rounds!
+    # FIX: Cast the Categorical columns back to Utf8/String context strictly during filter evaluation
     matched_lazy = lazy_df.filter(
-        (
-            (pl.col("person_id") == search_query) | 
-            (pl.col("person_name").str.to_lowercase().str.contains(search_query.lower()))
-        ) &
-        (pl.col("pos").is_in([1, 2, 3])) # Checked as integers now
+        (pl.col("person_id").cast(pl.Utf8) == search_query) | 
+        (pl.col("person_name").cast(pl.Utf8).str.to_lowercase().str.contains(search_query.lower()))
     )
 
     results_df = matched_lazy.collect()
@@ -98,19 +93,24 @@ def get_competitor_podiums(search_query: str):
     if results_df.is_empty():
         return None, None, f"No verified podium records discovered matching input: '{search_query}'"
 
-    # Normalize name allocations against index distributions
+    # Convert values to strings safely for tracking and template presentation formatting
+    results_df = results_df.with_columns([
+        pl.col("person_name").cast(pl.Utf8),
+        pl.col("person_id").cast(pl.Utf8),
+        pl.col("event_id").cast(pl.Utf8)
+    ])
+
+    # Resolve accurate competitor identities safely from string distributions
     competitor_name = results_df["person_name"].value_counts().sort("count", descending=True)["person_name"][0]
     competitor_id = results_df["person_id"].value_counts().sort("count", descending=True)["person_id"][0]
 
-    # Process dimensional aggregation
-    podium_counts = (
-        results_df.group_by(["event_id", "pos"])
-        .agg(pl.len().alias("count"))
+    # FIX: We sum the pre-computed 'count' metric here since the source parquet rows are already grouped
+    pivoted = (
+        results_df.pivot(on="pos", index="event_id", values="count", aggregate_function="sum")
+        .fill_null(0)
     )
 
-    pivoted = podium_counts.pivot(on="pos", index="event_id", values="count", aggregate_function="sum").fill_null(0)
-
-    # Check for integer column headers 1, 2, 3
+    # Confirm column alignments for structural integrity mapping
     for pos_col in [1, 2, 3]:
         if str(pos_col) not in pivoted.columns:
             pivoted = pivoted.with_columns(pl.lit(0).alias(str(pos_col)))
@@ -118,7 +118,7 @@ def get_competitor_podiums(search_query: str):
     pivoted = pivoted.rename({"1": "gold", "2": "silver", "3": "bronze"})
     pivoted = pivoted.with_columns((pl.col("gold") + pl.col("silver") + pl.col("bronze")).alias("total")).sort("total", descending=True)
 
-    # Calculate Enterprise KPI Summary Statistics
+    # Compute explicit overall metrics safely
     totals = {
         "gold": int(pivoted["gold"].sum()),
         "silver": int(pivoted["silver"].sum()),
