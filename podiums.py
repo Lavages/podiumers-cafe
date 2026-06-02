@@ -24,7 +24,8 @@ EVENT_NAMES = {
 def verify_and_compile_dataset():
     """
     Validates structural integrity of application assets. Evaluates binary Parquet availability.
-    Aggressively groups and sums records during compilation to smash file size to < 10MB.
+    Aggressively groups and sums records during compilation to smash file size to < 10MB,
+    strictly omitting DNF result markings.
     """
     if os.path.exists(PARQUET_PATH):
         return True
@@ -40,10 +41,13 @@ def verify_and_compile_dataset():
         # 1. Scan raw data lazily
         lazy_tsv = pl.scan_csv(TSV_PATH, separator="\t", has_header=True, infer_schema_length=0)
         
-        # 2. Filter for podium positions and final rounds immediately
+        # 2. Filter for podium positions, final rounds, AND explicitly exclude DNF values ("-1")
+        # In the WCA database schema, a single/average DNF status is represented as -1.
         filtered = lazy_tsv.filter(
             (pl.col("pos").is_in(["1", "2", "3"])) &
-            (pl.col("round_type_id").is_in(["f", "c"]))
+            (pl.col("round_type_id").is_in(["f", "c"])) &
+            (pl.col("best") != "-1") &       # Exclude best single DNF values
+            (pl.col("average") != "-1")      # Exclude average DNF values
         )
         
         # 3. Collapse the entire dataset by grouping names/IDs and positions immediately
@@ -82,7 +86,7 @@ def get_competitor_podiums(search_query: str):
     # Load high-speed schema mapping
     lazy_df = pl.scan_parquet(PARQUET_PATH)
 
-    # FIX: Cast the Categorical columns back to Utf8/String context strictly during filter evaluation
+    # Filter evaluation
     matched_lazy = lazy_df.filter(
         (pl.col("person_id").cast(pl.Utf8) == search_query) | 
         (pl.col("person_name").cast(pl.Utf8).str.to_lowercase().str.contains(search_query.lower()))
@@ -104,13 +108,13 @@ def get_competitor_podiums(search_query: str):
     competitor_name = results_df["person_name"].value_counts().sort("count", descending=True)["person_name"][0]
     competitor_id = results_df["person_id"].value_counts().sort("count", descending=True)["person_id"][0]
 
-    # FIX: We sum the pre-computed 'count' metric here since the source parquet rows are already grouped
+    # Sum the pre-computed 'count' metrics
     pivoted = (
         results_df.pivot(on="pos", index="event_id", values="count", aggregate_function="sum")
         .fill_null(0)
     )
 
-    # Confirm column alignments for structural integrity mapping
+    # Confirm column alignments
     for pos_col in [1, 2, 3]:
         if str(pos_col) not in pivoted.columns:
             pivoted = pivoted.with_columns(pl.lit(0).alias(str(pos_col)))
