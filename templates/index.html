@@ -20,7 +20,13 @@
             background-color: var(--bg-color);
             color: var(--htt-dark);
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px 12px; /* Balanced padding for small mobile boundaries */
+        }
+
+        @media (min-width: 640px) {
+            body {
+                padding: 40px 20px;
+            }
         }
 
         .container {
@@ -31,14 +37,21 @@
         /* Rubik's Cube Layout Header Card */
         .search-card {
             background: #ffffff;
-            padding: 40px 30px;
+            padding: 24px 16px;
             border-radius: 20px;
             box-shadow: 0 10px 25px -5px rgba(255, 105, 180, 0.15);
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             text-align: center;
             border: 4px solid var(--htt-dark);
             position: relative;
             overflow: hidden;
+        }
+
+        @media (min-width: 640px) {
+            .search-card {
+                padding: 40px 30px;
+                margin-bottom: 30px;
+            }
         }
 
         /* Cute decorative absolute border block paying homage to K-ON & Cubing styles */
@@ -51,34 +64,58 @@
 
         h1 {
             font-family: 'Fredoka One', cursive;
-            font-size: 36px;
+            font-size: 24px;
             color: var(--htt-dark);
             margin: 0 0 10px 0;
             letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 640px) {
+            h1 {
+                font-size: 36px;
+            }
         }
 
         .tagline {
-            font-size: 14px;
+            font-size: 11px;
             color: #8a7a7d;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 25px;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 640px) {
+            .tagline {
+                font-size: 14px;
+                letter-spacing: 0.1em;
+                margin-bottom: 25px;
+            }
         }
 
         .input-group {
             display: flex;
+            flex-direction: column;
             max-width: 550px;
             margin: 0 auto;
             gap: 12px;
         }
 
+        @media (min-width: 480px) {
+            .input-group {
+                flex-direction: row;
+            }
+        }
+
         input[type="text"] {
-            flex: 1;
-            padding: 14px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 16px;
             border: 3px solid var(--htt-dark);
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             outline: none;
             box-shadow: 4px 4px 0px var(--htt-dark);
@@ -91,16 +128,24 @@
         }
 
         button {
+            width: 100%;
             background: var(--htt-pink);
             color: white;
             border: 3px solid var(--htt-dark);
-            padding: 14px 28px;
+            padding: 14px 24px;
             font-size: 16px;
             font-weight: 800;
             border-radius: 12px;
             cursor: pointer;
             box-shadow: 4px 4px 0px var(--htt-dark);
             transition: all 0.2s ease;
+        }
+
+        @media (min-width: 480px) {
+            button {
+                width: auto;
+                padding: 14px 28px;
+            }
         }
 
         button:hover {
@@ -116,97 +161,160 @@
             border-radius: 12px;
             font-weight: 600;
             border: 3px solid #b91c1c;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             text-align: center;
+            font-size: 14px;
         }
 
         /* Profile Header Wrapper */
         .profile-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
             background: white;
-            padding: 20px 30px;
+            padding: 16px 20px;
             border: 4px solid var(--htt-dark);
             border-radius: 16px;
-            box-shadow: 6px 6px 0px var(--htt-dark);
-            margin-bottom: 35px;
+            box-shadow: 4px 4px 0px var(--htt-dark);
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 640px) {
+            .profile-container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 30px;
+                box-shadow: 6px 6px 0px var(--htt-dark);
+                margin-bottom: 35px;
+            }
         }
 
         .profile-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--htt-dark);
+            word-break: break-word;
+        }
+
+        @media (min-width: 640px) {
+            .profile-name {
+                font-size: 24px;
+            }
         }
 
         .profile-id {
-            font-size: 15px;
+            font-size: 13px;
             color: #7c6e71;
             font-weight: 600;
             margin-top: 4px;
+            word-break: break-word;
         }
 
         /* OVERALL PODIUM SUMMARY SECTION */
         .summary-stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 35px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .summary-stats {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+                margin-bottom: 35px;
+            }
         }
 
         .stat-card {
             background: white;
             border: 3px solid var(--htt-dark);
             border-radius: 14px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
-            box-shadow: 4px 4px 0px var(--htt-dark);
+            box-shadow: 3px 3px 0px var(--htt-dark);
+        }
+
+        @media (min-width: 640px) {
+            .stat-card {
+                padding: 15px;
+                box-shadow: 4px 4px 0px var(--htt-dark);
+            }
         }
 
         .stat-num {
             font-family: 'Fredoka One', cursive;
-            font-size: 28px;
+            font-size: 22px;
             margin-bottom: 4px;
         }
 
+        @media (min-width: 640px) {
+            .stat-num {
+                font-size: 28px;
+            }
+        }
+
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #6b5c5e;
         }
 
-        /* Table Dashboard Designs */
+        /* Table Dashboard Designs & Scrolling Protection */
         .table-wrapper {
             background: white;
             border: 4px solid var(--htt-dark);
             border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 8px 8px 0px var(--htt-dark);
+            overflow-x: auto; /* Handles horizontal overflow nicely on touch devices */
+            box-shadow: 6px 6px 0px var(--htt-dark);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (min-width: 640px) {
+            .table-wrapper {
+                box-shadow: 8px 8px 0px var(--htt-dark);
+            }
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 500px; /* Protects layout matrix constraints from collapsing on tiny screens */
         }
 
         th {
             background: var(--htt-dark);
             color: white;
             font-weight: 800;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            padding: 18px;
+            padding: 14px 12px;
             text-align: left;
         }
 
+        @media (min-width: 640px) {
+            th {
+                font-size: 13px;
+                padding: 18px;
+            }
+        }
+
         td {
-            padding: 18px;
+            padding: 14px 12px;
             border-bottom: 3px solid #f1eeef;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
+        }
+
+        @media (min-width: 640px) {
+            td {
+                padding: 18px;
+                font-size: 15px;
+            }
         }
 
         tr:last-child td {
@@ -222,12 +330,20 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 10px;
             font-family: 'Fredoka One', cursive;
-            font-size: 16px;
+            font-size: 14px;
             border: 2px solid var(--htt-dark);
+        }
+
+        @media (min-width: 640px) {
+            .medal-badge {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
         }
 
         .gold { background-color: #ffd700; color: #665200; box-shadow: 2px 2px 0px var(--htt-dark); }
@@ -236,10 +352,11 @@
 
         .total-pill {
             background: #f1f5f9;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 8px;
             border: 2px solid var(--htt-dark);
             font-weight: 800;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -283,7 +400,7 @@
                 </div>
                 <div class="stat-card" style="background-color: #fdf2f8; border-color: var(--htt-pink);">
                     <div class="stat-num" style="color: var(--htt-pink);">🏆 {{ totals.overall }}</div>
-                    <div class="stat-label" style="color: var(--htt-pink);">Overall Podiums</div>
+                    <div class="stat-label" style="color: var(--htt-pink);">Overall</div>
                 </div>
             </div>
             
